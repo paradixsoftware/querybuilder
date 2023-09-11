@@ -58,5 +58,22 @@ namespace SqlKata.Tests.SqlServer
                 "SELECT * FROM (SELECT *, ROW_NUMBER() OVER (ORDER BY (SELECT 0)) AS [row_num] FROM [users]) AS [results_wrapper] WHERE [row_num] >= " +
                 (offset + 1), c.ToString());
         }
+
+        [Fact()]
+        public void TestNested_Should_Compile()
+        {
+            // var q2 = new Query().Select(@"Test.{ Code, Test1 }").From("Test");
+            // var c2 = Compilers.CompileFor(EngineCodes.SqlServer, q2);
+
+            var q = new Query().Select(@"Test.{
+                 Code as Test,
+                 Test1 as lol
+            }").From("Test");
+
+            var c = Compilers.CompileFor(EngineCodes.SqlServer, q);
+
+            Assert.Equal("SELECT [Test].[Code] AS [Test], [Test].[Test1] AS [lol] FROM [Test]", c.ToString());
+            // Assert.Equal("SELECT [Test].[Code], [Test].[Test1] FROM [Test]", c2.ToString());
+        }
     }
 }
