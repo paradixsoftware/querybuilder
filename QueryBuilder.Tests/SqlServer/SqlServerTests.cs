@@ -62,8 +62,8 @@ namespace SqlKata.Tests.SqlServer
         [Fact()]
         public void TestNested_Should_Compile()
         {
-            // var q2 = new Query().Select(@"Test.{ Code, Test1 }").From("Test");
-            // var c2 = Compilers.CompileFor(EngineCodes.SqlServer, q2);
+            var q2 = new Query().Select(@"Test.{ Code, Test1 }").From("Test");
+            var c2 = Compilers.CompileFor(EngineCodes.SqlServer, q2);
 
             var q = new Query().Select(@"Test.{
                  Code as Test,
@@ -73,7 +73,25 @@ namespace SqlKata.Tests.SqlServer
             var c = Compilers.CompileFor(EngineCodes.SqlServer, q);
 
             Assert.Equal("SELECT [Test].[Code] AS [Test], [Test].[Test1] AS [lol] FROM [Test]", c.ToString());
-            // Assert.Equal("SELECT [Test].[Code], [Test].[Test1] FROM [Test]", c2.ToString());
+            Assert.Equal("SELECT [Test].[Code], [Test].[Test1] FROM [Test]", c2.ToString());
+        }
+
+        [Fact()]
+        public void VerbatimString_Should_Not_Be_Escaped()
+        {
+            var q = new Query().From("Test")
+                .Select(@"Test.{
+                    AvailDate as Date,
+                    Avail as Value
+                }",
+                "Test.MDR as MDR",
+                @"Test.{
+                    ShouldCompile AS ShouldCompile
+                }");
+
+            var c = Compilers.CompileFor(EngineCodes.SqlServer, q);
+
+            Assert.Equal("SELECT [Test].[AvailDate] AS [Date], [Test].[Avail] AS [Value], [Test].[MDR] AS [MDR], [Test].[ShouldCompile] AS [ShouldCompile] FROM [Test]", c.ToString());
         }
     }
 }
