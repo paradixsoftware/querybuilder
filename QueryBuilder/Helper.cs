@@ -136,7 +136,7 @@ namespace SqlKata
 
         public static List<string> ExpandExpression(string expression)
         {
-            expression = expression.Replace("\n", "").Replace("\r", "").Trim();
+            expression = expression.Replace("\r\n", string.Empty).Trim();
 
             var regex = @"^(?:\w+\.){1,2}{(.*)}";
             var match = Regex.Match(expression, regex);
