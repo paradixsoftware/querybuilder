@@ -59,6 +59,22 @@ namespace SqlKata.Tests.SqlServer
                 (offset + 1), c.ToString());
         }
 
+        [Fact()]
+        public void TestNested_Should_Compile()
+        {
+            var q = new Query().Select(@"Test.{
+                 Code as Test,
+                 Test1 as FromValue
+            }").From("Test");
+
+            var q2 = new Query().Select(@"Test.{ Code, Test1 }").From("Test");
+
+            var c = Compilers.CompileFor(EngineCodes.SqlServer, q);
+            var c2 = Compilers.CompileFor(EngineCodes.SqlServer, q2);
+
+            Assert.Equal("SELECT [Test].[Code] AS [Test], [Test].[Test1] AS [FromValue] FROM [Test]", c.ToString());
+            Assert.Equal("SELECT [Test].[Code], [Test].[Test1] FROM [Test]", c2.ToString());
+        }
 
         [Fact()]
         public void VerbatimString_Should_Not_Be_Escaped()
